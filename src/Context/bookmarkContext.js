@@ -5,6 +5,7 @@ const myContext = React.createContext({
     addBookmark : () => {},
     deleteBookmark : () => {},
     updateBookmark : () => {},
+    fetchAll: () => {},
 })
 
 export default myContext;

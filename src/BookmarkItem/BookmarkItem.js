@@ -2,73 +2,83 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import config from '../config';
 import myContext from '../Context/bookmarkContext';
-import history from '../history';
 import Rating from '../Rating/Rating';
 import './BookmarkItem.css';
 
-function handleClickedDelete(bookmarkId){
 
-  fetch(config.API_ENDPOINT+`/${bookmarkId}`,{
-    method: 'DELETE',
-    headers : {
-      'Authorization' : config.API_KEY,
-      'Content-Type' : 'application/json'
+
+export default class BookmarkItem extends React.Component {
+  static defaultProps = {
+    history: {
+      push: () =>{}
     }
-  })
-  .then(res => {
-    if(!res.ok){
-      return res.json().then(error => {throw error})
-    }
-    return res.json();
-  })
-  .then(()=> {
-    this.context.deleteBookmark(bookmarkId);
-    history.push('/');
-  })
-  .catch(e=>{
-    console.log(e);
-  })
-}
+  };
+  static contextType = myContext;
 
-
-export default function BookmarkItem(props) {
+  handleClickedDelete =(bookmarkId) =>{
+  
+    fetch(config.API_ENDPOINT+`/${bookmarkId}`,{
+      method: 'DELETE',
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${config.API_KEY}`
+      }
+    })
+    .then(res => {
+      if (!res.ok) {
+        // get the error message from the response,
+        return res.json().then(error => {
+          // then throw it
+          throw error
+        })
+      }
+    //  return res.json()
+    })
+    .then(()=> {
+     return this.context.fetchAll();
+    })
+    .then(()=>{
+     return this.props.history.push('/');
+    })
+    .catch(e=>{
+      console.log(e);
+    })
+  }
+ 
+  render(){
   return ( 
-    <myContext.Consumer>
-    {(context) =>
+    
     <li className='BookmarkItem'>
       <div className='BookmarkItem__row'>
         <h3 className='BookmarkItem__title'>
           <a
-            href={props.url}
+            href={this.props.url}
             target='_blank'
             rel='noopener noreferrer'>
-            {props.title}
+            {this.props.title}
           </a>
         </h3>
-        <Rating value={props.rating} />
+        <Rating value={this.props.rating} />
       </div>
       <p className='BookmarkItem__description'>
-        {props.description}
+        {this.props.description}
       </p>
       <div className='BookmarkItem__buttons'>
-        <Link to={`/edit/${props.id}`}>
+        <Link to={`/edit/${this.props.id}`}>
           <button className='BookmarkItem__description'>
             Edit
           </button>
         </Link>
         <button
           className='BookmarkItem__description'
-          onClick={()=> handleClickedDelete(props.id, context.deleteBookmark)}
+          onClick={()=> this.handleClickedDelete(this.props.id)}
         >
           Delete
         </button>
       </div>
-    </li>}
-    </myContext.Consumer>
-  )
+    </li>
+    
+  )}
   
 }
 
-BookmarkItem.defaultProps = {
-  onClickDelete: () => {},
-}

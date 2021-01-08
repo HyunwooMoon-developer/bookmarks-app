@@ -70,8 +70,8 @@ class App extends Component {
       })
   }
 
-  componentDidMount() {
-    fetch(config.API_ENDPOINT, {
+  fetchAll =() => {
+    return fetch(config.API_ENDPOINT, {
       method: 'GET',
       headers: {
         'content-type': 'application/json',
@@ -88,12 +88,17 @@ class App extends Component {
       .catch(error => this.setState({ error }))
   }
 
+  componentDidMount(){
+    this.fetchAll()
+  }
+
   render() {
     const contextValues = {
       bookmarks : this.state.bookmarks,
       addBookmark : this.addBookmark,
       deleteBookmark : this.deleteBookmark,
       updateBookmark : this.updateBookmark,
+      fetchAll : this.fetchAll,
     }
     return (
       <main className='App'>

@@ -83,18 +83,23 @@ class EditBookmark extends Component {
         const newBookmark = {id, title, url, description, rating}
         fetch(config.API_ENDPOINT + `/${bookmarkId}`, {
             method : 'PATCH',
+            headers: {
+              'content-type': 'application/json',
+              'authorization': `bearer ${config.API_KEY}`
+            },
             body : JSON.stringify(newBookmark)
         })
         .then(res => {
             if(!res.ok){
                 return res.json().then(error => {throw error})
             }
-            return res.json();
+          //  return res.json();
         })
         .then(()=>{
-            this.context.updateBookmark(newBookmark)
-            this.props.history('/')
-        })
+            return this.context.fetchAll()})
+        .then(()=>{
+          this.props.history.push('/')
+        })    
         .catch(e=>{
             console.log(e)
         })
