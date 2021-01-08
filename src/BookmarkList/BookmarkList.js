@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import BookmarkItem from '../BookmarkItem/BookmarkItem';
+import myContext from '../Context/bookmarkContext';
 import './BookmarkList.css'
 
 class BookmarkList extends Component {
-  static defaultProps = {
-    bookmarks: []
-  };
+  static contextType = myContext;
 
   render() {
-    const { bookmarks } = this.props
+    const { bookmarks } = this.context;
     return (
       <section className='BookmarkList'>
         <h2>Your bookmarks</h2>

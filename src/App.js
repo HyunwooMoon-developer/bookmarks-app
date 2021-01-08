@@ -1,9 +1,14 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 import React, { Component } from 'react';
 import AddBookmark from './AddBookmark/AddBookmark';
 import BookmarkList from './BookmarkList/BookmarkList';
 import Nav from './Nav/Nav';
 import config from './config';
 import './App.css';
+import myContext from './Context/bookmarkContext';
+import { Route } from 'react-router-dom';
+import EditBookmark from './EditBookmark/EditBookmark';
 
 const bookmarks = [
   // {
@@ -31,20 +36,14 @@ const bookmarks = [
 
 class App extends Component {
   state = {
-    page: 'list',
-    bookmarks,
+    bookmarks : [],
     error: null,
   };
-
-  changePage = (page) => {
-    this.setState({ page })
-  }
 
   setBookmarks = bookmarks => {
     this.setState({
       bookmarks,
       error: null,
-      page: 'list',
     })
   }
 
@@ -60,8 +59,15 @@ class App extends Component {
    }) 
   }
 
-  updateBookmark = () => {
-
+  updateBookmark = updateBookmark => {
+    const newBookmark = this.state.bookmarks.map(bookmark=>
+      (bookmark.id === updateBookmark.id)
+                    ? updateBookmark
+                    : bookmark
+      )
+      this.setState({
+        bookmarks : newBookmark,
+      })
   }
 
   componentDidMount() {
@@ -83,30 +89,23 @@ class App extends Component {
   }
 
   render() {
-    const values = {
+    const contextValues = {
       bookmarks : this.state.bookmarks,
       addBookmark : this.addBookmark,
       deleteBookmark : this.deleteBookmark,
       updateBookmark : this.updateBookmark,
     }
-    const { page, bookmarks } = this.state
     return (
       <main className='App'>
+        <myContext.Provider value={contextValues}>
         <h1>Bookmarks!</h1>
-        <Nav clickPage={this.changePage} />
+        <Nav />
         <div className='content' aria-live='polite'>
-          {page === 'add' && (
-            <AddBookmark
-              onAddBookmark={this.addBookmark}
-              onClickCancel={() => this.changePage('list')}
-            />
-          )}
-          {page === 'list' && (
-            <BookmarkList
-              bookmarks={bookmarks}
-            />
-          )}
+          <Route exact path='/' component={BookmarkList} />
+          <Route path='/add-bookmark' component={AddBookmark} />
+          <Route path='/edit/:bookmarkId' component={EditBookmark} />
         </div>
+        </myContext.Provider>
       </main>
     );
   }
